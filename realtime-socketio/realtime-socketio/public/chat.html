@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ChatApp</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="chat-page">
+<div class="chat-layout">
+
+  <!-- ── Sidebar ──────────────────────────────────────────────────────────── -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">ChatApp</div>
+      <div class="user-info" onclick="openProfile()" title="Your profile">
+        <div class="user-avatar" id="myAvatar">?</div>
+        <span id="myUsername">...</span>
+        <span class="profile-caret">▾</span>
+      </div>
+    </div>
+
+    <button class="doodle-btn" onclick="openDoodle()">
+      <span class="doodle-icon">✏️</span>
+      <span class="doodle-label">FuNNDooDLE</span>
+    </button>
+
+    <div class="sidebar-section-label">Online now</div>
+    <ul class="user-list" id="userList">
+      <li class="user-item active" data-user="Everyone">
+        <div class="user-avatar group-avatar">#</div>
+        <div class="user-details">
+          <span class="user-name">Everyone</span>
+          <span class="user-status">Public room</span>
+        </div>
+      </li>
+    </ul>
+  </aside>
+
+  <!-- ── Main chat ─────────────────────────────────────────────────────────── -->
+  <main class="chat-main">
+    <div class="chat-header">
+      <div class="chat-header-info">
+        <div class="chat-avatar group-avatar" id="chatAvatar">#</div>
+        <div>
+          <div class="chat-name" id="chatName">Everyone</div>
+          <div class="chat-status" id="chatStatus">Public room</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="messages-area" id="messagesArea">
+      <div id="messagesLoading" class="messages-loading">Loading messages...</div>
+    </div>
+    <div class="typing-indicator" id="typingIndicator"></div>
+
+    <div class="chat-input-area">
+      <div class="recipient-row">
+        <label>Send to:</label>
+        <select id="recipientSelect">
+          <option value="Everyone">Everyone</option>
+          <option value="Broadcast">🚨 Urgent Broadcast</option>
+        </select>
+      </div>
+      <div class="chat-input-row">
+        <input type="text" id="messageInput" placeholder="Type a message..." autocomplete="off" maxlength="1000" />
+        <button class="send-btn" onclick="sendMessage()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ── Profile Panel ────────────────────────────────────────────────────────── -->
+<div class="overlay" id="profileOverlay" onclick="closeProfile()"></div>
+<div class="profile-panel" id="profilePanel">
+  <div class="panel-header">
+    <h2>My Profile</h2>
+    <button class="panel-close" onclick="closeProfile()">✕</button>
+  </div>
+  <div class="profile-hero">
+    <div class="profile-avatar" id="profileAvatar">?</div>
+    <div class="profile-username" id="profileUsername">...</div>
+  </div>
+
+  <div class="panel-section">
+    <div class="panel-section-title">🎨 My message color</div>
+    <div class="color-swatches" id="profileColorSwatches"></div>
+    <button class="btn-secondary" onclick="saveColor()">Save color</button>
+    <div class="save-feedback" id="colorSaveFeedback"></div>
+  </div>
+
+  <div class="panel-section">
+    <div class="panel-section-title">🚫 Block a user</div>
+    <div class="block-row">
+      <select id="blockSelect"><option value="">— choose user —</option></select>
+      <button class="btn-danger" onclick="blockUser()">Block</button>
+    </div>
+    <ul class="blocked-list" id="blockedList"></ul>
+  </div>
+
+  <div class="panel-section">
+    <div class="panel-section-title">👥 Create a group</div>
+    <input type="text" class="panel-input" id="groupName" placeholder="Group name..." maxlength="30" />
+    <div class="panel-section-title" style="margin-top:10px;font-size:12px">Add members:</div>
+    <div class="group-members-list" id="groupMembersList"></div>
+    <button class="btn-secondary" onclick="createGroup()" style="margin-top:10px">Create Group</button>
+    <div class="save-feedback" id="groupFeedback"></div>
+  </div>
+
+  <div class="panel-section">
+    <button class="btn-logout-full" onclick="logout()">🚪 Log Out</button>
+  </div>
+</div>
+
+<!-- ── FunnDoodle Modal ──────────────────────────────────────────────────────── -->
+<div class="overlay" id="doodleOverlay" onclick="closeDoodle()"></div>
+<div class="doodle-modal" id="doodleModal">
+  <div class="doodle-header">
+    <div class="doodle-title">✏️ FuNNDooDLE</div>
+    <div class="doodle-subtitle" id="doodleRoomLabel">Room: Everyone</div>
+    <select id="doodleRoomSelect" onchange="joinDoodleRoom(this.value)" class="doodle-room-select">
+      <option value="Everyone">🌐 Everyone</option>
+    </select>
+    <button class="panel-close" onclick="closeDoodle()">✕</button>
+  </div>
+
+  <div class="doodle-toolbar">
+    <div class="tool-group" id="doodleColors"></div>
+    <div class="tool-group">
+      <button class="tool-btn active" id="toolPen"    onclick="setTool('pen')"    title="Pen">✏️</button>
+      <button class="tool-btn"        id="toolFill"   onclick="setTool('fill')"   title="Fill bucket">🪣</button>
+      <button class="tool-btn"        id="toolEraser" onclick="setTool('eraser')" title="Eraser">🧹</button>
+    </div>
+    <div class="tool-group">
+      <label class="tool-label">Size</label>
+      <input type="range" id="brushSize" min="2" max="40" value="6" oninput="updateBrushSize(this.value)" />
+      <span id="brushSizeLabel">6</span>
+    </div>
+    <div class="tool-group">
+      <button class="tool-btn" onclick="clearCanvas()" title="Clear all">🗑️</button>
+      <button class="tool-btn" onclick="saveDrawing()" title="Save image">💾</button>
+    </div>
+  </div>
+
+  <div class="doodle-canvas-wrap">
+    <canvas id="doodleCanvas"></canvas>
+    <div class="doodle-cursor" id="doodleCursor"></div>
+  </div>
+
+  <div class="doodle-footer">
+    <span id="doodleOnline">🟢 Just you</span>
+    <span class="doodle-hint">Draw together in real time!</span>
+  </div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="client.js"></script>
+<script src="doodle.js"></script>
+</body>
+</html>
